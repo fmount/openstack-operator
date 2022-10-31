@@ -19,6 +19,7 @@ package core
 import (
 	"context"
 
+	ansibleeev1 "github.com/openstack-k8s-operators/ansibleee-operator/api/v1alpha1"
 	cinderv1 "github.com/openstack-k8s-operators/cinder-operator/api/v1beta1"
 	glancev1 "github.com/openstack-k8s-operators/glance-operator/api/v1beta1"
 	keystonev1 "github.com/openstack-k8s-operators/keystone-operator/api/v1beta1"
@@ -203,6 +204,13 @@ func (r *OpenStackControlPlaneReconciler) reconcileNormal(ctx context.Context, i
 		return ctrlResult, nil
 	}
 
+	ctrlResult, err = openstack.ReconcileAnsible(ctx, instance, helper)
+	if err != nil {
+		return ctrl.Result{}, err
+	} else if (ctrlResult != ctrl.Result{}) {
+		return ctrlResult, nil
+	}
+
 	return ctrl.Result{}, nil
 }
 
@@ -215,6 +223,7 @@ func (r *OpenStackControlPlaneReconciler) SetupWithManager(mgr ctrl.Manager) err
 		Owns(&placementv1.PlacementAPI{}).
 		Owns(&glancev1.Glance{}).
 		Owns(&cinderv1.Cinder{}).
+		Owns(&ansibleeev1.AnsibleEE{}).
 		Owns(&rabbitmqv1.RabbitmqCluster{}).
 		Complete(r)
 }

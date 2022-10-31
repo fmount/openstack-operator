@@ -24,6 +24,7 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
+	ansibleeev1 "github.com/openstack-k8s-operators/ansibleee-operator/api/v1alpha1"
 	cinderv1 "github.com/openstack-k8s-operators/cinder-operator/api/v1beta1"
 	glancev1 "github.com/openstack-k8s-operators/glance-operator/api/v1beta1"
 	keystonev1 "github.com/openstack-k8s-operators/keystone-operator/api/v1beta1"
@@ -59,6 +60,7 @@ func init() {
 	utilruntime.Must(placementv1.AddToScheme(scheme))
 	utilruntime.Must(glancev1.AddToScheme(scheme))
 	utilruntime.Must(cinderv1.AddToScheme(scheme))
+	utilruntime.Must(ansibleeev1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 

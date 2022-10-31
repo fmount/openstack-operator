@@ -17,6 +17,7 @@ limitations under the License.
 package v1beta1
 
 import (
+	ansibleeev1 "github.com/openstack-k8s-operators/ansibleee-operator/api/v1alpha1"
 	cinderv1 "github.com/openstack-k8s-operators/cinder-operator/api/v1beta1"
 	glancev1 "github.com/openstack-k8s-operators/glance-operator/api/v1beta1"
 	keystonev1 "github.com/openstack-k8s-operators/keystone-operator/api/v1beta1"
@@ -65,6 +66,11 @@ type OpenStackControlPlaneSpec struct {
 	// +kubebuilder:validation:Optional
 	// RabbitmqTemplate - Overrides to use when creating the Rabbitmq cluster
 	RabbitmqTemplate rabbitmqv1.RabbitmqClusterSpec `json:"rabbitmqTemplate,omitempty"`
+
+	// +kubebuilder:validation:Optional
+	// AnsibleTemplate - Overrides to use when creating the Ansibleee job
+	AnsibleTemplate ansibleeev1.AnsibleEESpec `json:"ansibleTemplate,omitempty"`
+
 }
 
 // OpenStackControlPlaneStatus defines the observed state of OpenStackControlPlane

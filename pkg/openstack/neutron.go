@@ -44,6 +44,21 @@ func ReconcileNeutron(ctx context.Context, instance *corev1beta1.OpenStackContro
 		if neutronAPI.Spec.DatabaseInstance == "" {
 			neutronAPI.Spec.DatabaseInstance = "openstack"
 		}
+
+		if len(neutronAPI.Spec.ExtraMounts) == 0 {
+
+			var neutronVolumes []neutronv1.NeutronExtraVolMounts
+
+			for _, ev := range instance.Spec.ExtraMounts {
+				neutronVolumes = append(neutronVolumes, neutronv1.NeutronExtraVolMounts{
+					Name:      ev.Name,
+					Region:    ev.Region,
+					VolMounts: ev.VolMounts,
+				})
+			}
+			neutronAPI.Spec.ExtraMounts = neutronVolumes
+		}
+
 		err := controllerutil.SetControllerReference(helper.GetBeforeObject(), neutronAPI, helper.GetScheme())
 		if err != nil {
 			return err

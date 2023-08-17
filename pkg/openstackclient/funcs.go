@@ -67,6 +67,10 @@ func ClientPod(
 					Name:  "SECRET_HASH",
 					Value: secretHash,
 				},
+				{
+					Name:  "OS_SHARE_API_VERSION",
+					Value: "2.53",
+				},
 			},
 			VolumeMounts: []corev1.VolumeMount{
 				{

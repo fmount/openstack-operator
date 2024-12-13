@@ -3735,6 +3735,13 @@ spec:
                                 caBundleSecretName:
                                   type: string
                               type: object
+                            topologyRef:
+                              properties:
+                                name:
+                                  type: string
+                                namespace:
+                                  type: string
+                              type: object
                             type:
                               default: split
                               enum:
@@ -3813,6 +3820,13 @@ spec:
                           storageClass:
                             type: string
                           storageRequest:
+                            type: string
+                        type: object
+                      topologyRef:
+                        properties:
+                          name:
+                            type: string
+                          namespace:
                             type: string
                         type: object
                     required:
@@ -16560,6 +16574,23 @@ spec:
                             type: object
                         type: object
                     type: object
+                type: object
+              topology:
+                properties:
+                  maxSkew:
+                    format: int32
+                    type: integer
+                  topologyKey:
+                    type: string
+                  whenUnsatisfiable:
+                    enum:
+                    - DoNotSchedule
+                    - ScheduleAnyway
+                    type: string
+                required:
+                - maxSkew
+                - topologyKey
+                - whenUnsatisfiable
                 type: object
             required:
             - secret

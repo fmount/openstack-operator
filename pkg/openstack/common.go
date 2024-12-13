@@ -3,6 +3,7 @@ package openstack
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	certmgrv1 "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
@@ -16,6 +17,7 @@ import (
 	memcachedv1 "github.com/openstack-k8s-operators/infra-operator/apis/memcached/v1beta1"
 	networkv1 "github.com/openstack-k8s-operators/infra-operator/apis/network/v1beta1"
 	redisv1 "github.com/openstack-k8s-operators/infra-operator/apis/redis/v1beta1"
+	topologyv1 "github.com/openstack-k8s-operators/infra-operator/apis/topology/v1beta1"
 	ironicv1 "github.com/openstack-k8s-operators/ironic-operator/api/v1beta1"
 	keystonev1 "github.com/openstack-k8s-operators/keystone-operator/api/v1beta1"
 	"github.com/openstack-k8s-operators/lib-common/modules/certmanager"
@@ -45,6 +47,7 @@ import (
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -794,4 +797,66 @@ func hasCertInOverrideSpec(overrideSpec route.OverrideSpec) bool {
 	return overrideSpec.Spec.TLS.CACertificate != "" &&
 		overrideSpec.Spec.TLS.Certificate != "" &&
 		overrideSpec.Spec.TLS.Key != ""
+}
+
+// Get a DefaultTopology that should be applied to the Service operators Pods
+func GetDefaultTopology(
+	ctx context.Context,
+	helper *helper.Helper,
+	name string,
+	selectorKey string,
+	selectorValues []string,
+	instance *corev1.OpenStackControlPlane,
+) error {
+	Log := GetLogger(ctx)
+	t := topologyv1.TopologySpec{
+		TopologySpreadConstraint: &[]k8s_corev1.TopologySpreadConstraint{
+			{
+				LabelSelector: &metav1.LabelSelector{
+					MatchExpressions: []metav1.LabelSelectorRequirement{
+						{
+							Key:      selectorKey,
+							Operator: metav1.LabelSelectorOpIn,
+							Values:   selectorValues,
+						},
+					},
+				},
+				// usually corev1.LabelHostname "kubernetes.io/hostname"
+				// https://github.com/kubernetes/api/blob/master/core/v1/well_known_labels.go#L20
+				TopologyKey:       *instance.Spec.Topology.TopologyKey,
+				MaxSkew:           *instance.Spec.Topology.MaxSkew,
+				WhenUnsatisfiable: UnsatisfiableConstraintAction(*instance.Spec.Topology.WhenUnsatisfiable),
+			},
+		},
+	}
+	topo := &topologyv1.Topology{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: instance.Namespace,
+		},
+	}
+	op, err := controllerutil.CreateOrPatch(ctx, helper.GetClient(), topo, func() error {
+		topo.Spec = t
+		err := controllerutil.SetControllerReference(helper.GetBeforeObject(), &topo.ObjectMeta, helper.GetScheme())
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if op != controllerutil.OperationResultNone {
+		Log.Info(fmt.Sprintf("Topology %s - %s", topo.Name, op))
+	}
+	return err
+}
+
+// UnsatisfiableConstraintAction -
+func UnsatisfiableConstraintAction(s string) k8s_corev1.UnsatisfiableConstraintAction {
+	switch strings.ToLower(s) {
+	case "donotschedule":
+		return k8s_corev1.DoNotSchedule
+	case "scheduleanyway":
+		return k8s_corev1.ScheduleAnyway
+	default:
+		return k8s_corev1.DoNotSchedule
+	}
 }

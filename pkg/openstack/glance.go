@@ -24,6 +24,7 @@ const (
 	// the label on public svc gets set to -external and internal instance svc
 	// to -internal instead of the glance top level glanceType split
 	svcSelector = "tlGlanceAPI"
+	appSelector = "glance"
 )
 
 // ReconcileGlance -
@@ -64,6 +65,18 @@ func ReconcileGlance(ctx context.Context, instance *corev1beta1.OpenStackControl
 
 	if instance.Spec.Glance.Template.NodeSelector == nil {
 		instance.Spec.Glance.Template.NodeSelector = &instance.Spec.NodeSelector
+	}
+
+	if instance.Spec.Glance.Template.Topology == nil && instance.Spec.Topology != nil {
+		topologyName := fmt.Sprintf("default-%s", appSelector)
+		err := GetDefaultTopology(ctx, helper, topologyName, "service", []string{appSelector}, instance)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+		instance.Spec.Glance.Template.Topology = &glancev1.TopologyRef{
+			Name:      topologyName,
+			Namespace: instance.Namespace,
+		}
 	}
 
 	// When component services got created check if there is the need to create a route

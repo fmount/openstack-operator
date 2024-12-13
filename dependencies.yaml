@@ -14,7 +14,7 @@ dependencies:
   - type: olm.package
     value:
       packageName: glance-operator
-      version: ">=0.0.0"
+      version: ">=0.0.3"
   - type: olm.package
     value:
       packageName: horizon-operator

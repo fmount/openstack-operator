@@ -8,6 +8,7 @@ import (
 	"github.com/openstack-k8s-operators/lib-common/modules/common/condition"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/helper"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/service"
+	"github.com/openstack-k8s-operators/lib-common/modules/common/topology"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/util"
 	corev1beta1 "github.com/openstack-k8s-operators/openstack-operator/apis/core/v1beta1"
 	k8s_errors "k8s.io/apimachinery/pkg/api/errors"
@@ -23,7 +24,9 @@ const (
 	// label set by the service operator as in case of split glanceAPI type the
 	// the label on public svc gets set to -external and internal instance svc
 	// to -internal instead of the glance top level glanceType split
-	svcSelector = "tlGlanceAPI"
+	svcSelector    = "tlGlanceAPI"
+	appSelector    = "glance"
+	appSelectorKey = "service"
 )
 
 // ReconcileGlance -
@@ -64,6 +67,18 @@ func ReconcileGlance(ctx context.Context, instance *corev1beta1.OpenStackControl
 
 	if instance.Spec.Glance.Template.NodeSelector == nil {
 		instance.Spec.Glance.Template.NodeSelector = &instance.Spec.NodeSelector
+	}
+
+	if instance.Spec.Glance.Template.TopologyRef == nil && instance.Spec.Topology != nil {
+		topologyName := fmt.Sprintf("default-%s", glanceName)
+		err := CreateOrUpdateTopology(ctx, helper, topologyName, appSelectorKey, []string{appSelector}, instance)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+		instance.Spec.Glance.Template.TopologyRef = &topology.Ref{
+			Name:      topologyName,
+			Namespace: instance.Namespace,
+		}
 	}
 
 	// When component services got created check if there is the need to create a route

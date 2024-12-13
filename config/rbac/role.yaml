@@ -822,3 +822,15 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - topology.openstack.org
+  resources:
+  - topologies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch

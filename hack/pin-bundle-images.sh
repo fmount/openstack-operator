@@ -1,5 +1,6 @@
 #!/bin/bash
 set -eo pipefail
+set -x
 
 # This script can be executed in 2 modes. If DOCKERFILE is set then we replace the image locations there with pinned SHA version.
 # If no DOCKERFILE is set the script just echo's a list of bundle dependencies to stout as a single common separated line. This
@@ -17,7 +18,7 @@ if [ -n "$DOCKERFILE" ]; then
 fi
 
 #loop over each openstack-k8s-operators go.mod entry
-MOD_PATHS=$(go list -mod=readonly -m -json all | jq -r '. | select(.Path | contains("openstack")) | .Replace // . |.Path' | grep -v openstack-operator | grep -v lib-common)
+MOD_PATHS=$(go list -mod=readonly -m -json all | jq -r '. | select(.Path | contains("openstack")) | .Replace // . |.Path' | grep -v openstack-operator | grep -v lib-common | grep -v glance)
 for MOD_PATH in ${MOD_PATHS}; do
     if [[ "$MOD_PATH" == "./apis" ]]; then
         continue
@@ -43,6 +44,9 @@ for MOD_PATH in ${MOD_PATHS}; do
     CURL_REGISTRY="quay.io"
     REPO_CURL_URL="https://${CURL_REGISTRY}/api/v1/repository/openstack-k8s-operators"
     REPO_URL="${CURL_REGISTRY}/openstack-k8s-operators"
+    if [[ $BASE == "glance" || $BASE == "infra" ]]; then
+        GITHUB_USER=fpantano
+    fi
     if [[ "$GITHUB_USER" != "openstack-k8s-operators" || "$BASE" == "$IMAGEBASE" ]]; then
         if [[ "$IMAGENAMESPACE" != "openstack-k8s-operators" || "${IMAGEREGISTRY}" != "quay.io" ]]; then
             REPO_URL="${IMAGEREGISTRY}/${IMAGENAMESPACE}"
@@ -55,6 +59,7 @@ for MOD_PATH in ${MOD_PATHS}; do
                 # replace docker.io by hub.docker.com to read tags
                 REPO_CURL_URL="https://hub.docker.com/v2/repositories/${IMAGENAMESPACE}"
             else
+                GITHUB_USER=fpantano
                 REPO_CURL_URL="https://${CURL_REGISTRY}/api/v1/repository/${IMAGENAMESPACE}"
             fi
         else
@@ -89,4 +94,5 @@ done
 if [ -z "$DOCKERFILE" ]; then
     # pin rabbit to sha256 for our v2.9.0_patches fork
     echo -n ",quay.io/openstack-k8s-operators/rabbitmq-cluster-operator-bundle@sha256:bad31e1b028840ac3c199efc3a8ecb3c87bdb68e6a11c8e32a7dbcd5a4d4114d"
+    echo -n ",quay.io/fpantano/glance-operator-bundle@sha256:04c9822baff10d78a4562a9f3a51e3b250c4aa6f6f44d0813bba112553fc1723"
 fi

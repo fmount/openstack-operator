@@ -211,6 +211,29 @@ type OpenStackControlPlaneSpec struct {
 	// template Section, the globally defined ExtraMounts are ignored and
 	// overridden for the operator which has this section already.
 	ExtraMounts []OpenStackExtraVolMounts `json:"extraMounts,omitempty"`
+
+	//TopologySection -
+	Topology *TopologySection `json:"topology,omitempty"`
+}
+
+
+// TopologySection defines the desired state of the Topology CR applied to the control plane services
+type TopologySection struct {
+	// MaxSkew describes the degree to which pods may be unevenly distributed.
+	// When `whenUnsatisfiable=DoNotSchedule`, it is the maximum permitted difference
+	// between the number of matching pods in the target topology and the global minimum.
+	MaxSkew *int32 `json:"maxSkew" protobuf:"varint,1,opt,name=maxSkew"`
+	// TopologyKey is the key of node labels. Nodes that have a label with this key
+	// and identical values are considered to be in the same topology.
+	TopologyKey *string `json:"topologyKey" protobuf:"bytes,2,opt,name=topologyKey"`
+	// WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy
+	// the spread constraint.
+	// - DoNotSchedule (default) tells the scheduler not to schedule it.
+	// - ScheduleAnyway tells the scheduler to schedule the pod in any location,
+	//   but giving higher precedence to topologies that would help reduce the
+	//   skew.
+	// +kubebuilder:validation:Enum=DoNotSchedule;ScheduleAnyway
+	WhenUnsatisfiable *string `json:"whenUnsatisfiable" protobuf:"bytes,3,opt,name=whenUnsatisfiable"`
 }
 
 // TLSSection defines the desired state of TLS configuration

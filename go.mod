@@ -19,12 +19,12 @@ require (
 	github.com/openstack-k8s-operators/glance-operator/api v0.5.1-0.20250107181221-97b553dc065e
 	github.com/openstack-k8s-operators/heat-operator/api v0.5.1-0.20250107183423-65b8e596796a
 	github.com/openstack-k8s-operators/horizon-operator/api v0.5.1-0.20250106004957-8f2f2c4a1720
-	github.com/openstack-k8s-operators/infra-operator/apis v0.5.1-0.20250108092548-58707fa645ce
+	github.com/openstack-k8s-operators/infra-operator/apis v0.5.1-0.20250123115751-98853871de94
 	github.com/openstack-k8s-operators/ironic-operator/api v0.5.1-0.20250107140737-1d83138767c2
 	github.com/openstack-k8s-operators/keystone-operator/api v0.5.1-0.20250107165241-16c3ed8e549f
 	github.com/openstack-k8s-operators/lib-common/modules/ansible v0.5.0
 	github.com/openstack-k8s-operators/lib-common/modules/certmanager v0.5.1-0.20241216113837-d172b3ac0f4e
-	github.com/openstack-k8s-operators/lib-common/modules/common v0.5.1-0.20241216113837-d172b3ac0f4e
+	github.com/openstack-k8s-operators/lib-common/modules/common v0.5.1-0.20250120114122-4bcef17ff6fa
 	github.com/openstack-k8s-operators/lib-common/modules/storage v0.5.1-0.20241216113837-d172b3ac0f4e
 	github.com/openstack-k8s-operators/lib-common/modules/test v0.5.1-0.20241216113837-d172b3ac0f4e
 	github.com/openstack-k8s-operators/manila-operator/api v0.5.1-0.20250107174206-3cd2760d87b4
@@ -126,3 +126,7 @@ replace github.com/openshift/api => github.com/openshift/api v0.0.0-202408300231
 
 // custom RabbitmqClusterSpecCore for OpenStackControlplane (v2.9.0_patches_tag)
 replace github.com/rabbitmq/cluster-operator/v2 => github.com/openstack-k8s-operators/rabbitmq-cluster-operator/v2 v2.6.1-0.20241017142550-a3524acedd49 //allow-merging
+
+replace github.com/openstack-k8s-operators/glance-operator/api => github.com/fmount/glance-operator/api v0.0.0-20250123151942-b781eccb0fdb //allow-merging
+
+replace github.com/openstack-k8s-operators/lib-common/modules/common => github.com/fmount/lib-common/modules/common v0.0.0-20250123151610-bfe0d1005744

@@ -20421,6 +20421,15 @@ spec:
                   testTobikoImage:
                     type: string
                 type: object
+              services:
+                items:
+                  properties:
+                    name:
+                      type: string
+                    version:
+                      type: string
+                  type: object
+                type: array
               targetVersion:
                 type: string
             required:
@@ -20845,6 +20854,15 @@ spec:
                   glanceWsgi:
                     type: string
                 type: object
+              services:
+                items:
+                  properties:
+                    name:
+                      type: string
+                    version:
+                      type: string
+                  type: object
+                type: array
             type: object
         type: object
     served: true

@@ -44,6 +44,10 @@ type OpenStackVersionSpec struct {
 
 	// CustomContainerImages is a list of containerImages to customize for deployment
 	CustomContainerImages CustomContainerImages `json:"customContainerImages,omitempty"`
+
+	// Services -
+	// +kubebuilder:validation:optional
+	Services []ServiceVersion `json:"services,omitempty"`
 }
 
 // CustomContainerImages - struct for custom container images
@@ -166,6 +170,12 @@ type ContainerTemplate struct {
 	TestAnsibletestImage              *string `json:"testAnsibletestImage,omitempty"`
 }
 
+// ServiceVersion -
+type ServiceVersion struct {
+	Name string `json:"name,omitempty"`
+	Version string `json:"version,omitempty"`
+}
+
 // ServiceDefaults - struct that contains defaults for OSP services that can change over time
 // but are associated with a specific OpenStack release version
 type ServiceDefaults struct {
@@ -192,6 +202,9 @@ type OpenStackVersionStatus struct {
 
 	// ServiceDefaults - struct that contains current defaults for OSP services
 	ServiceDefaults ServiceDefaults `json:"serviceDefaults,omitempty"`
+
+	// ServicesVersion -
+	ServicesVersion []ServiceVersion `json:"services,omitempty"`
 
 	//ObservedGeneration - the most recent generation observed for this object.
 	ObservedGeneration int64 `json:"observedGeneration,omitempty"`

@@ -205,7 +205,11 @@ func (r *OpenStackVersionReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		Log.Info("Target version not found in defaults", "targetVersion", instance.Spec.TargetVersion)
 		return ctrl.Result{}, nil
 	}
-	instance.Status.ContainerImages = openstack.GetContainerImages(val, *instance)
+	containerImages := openstack.GetContainerImages(val, *instance)
+
+	// Replace images for staggered upgrade ...
+	openstack.ReplaceContainerImageForServices(ctx, instance, &containerImages)
+	instance.Status.ContainerImages = containerImages
 
 	// initialize service defaults
 	serviceDefaults := openstack.InitializeOpenStackVersionServiceDefaults(ctx)

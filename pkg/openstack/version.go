@@ -347,3 +347,44 @@ func ControlplaneContainerImageMatch(ctx context.Context, controlPlane *corev1be
 
 	return false, failedMatches
 }
+
+type ImageUpdater func(source *corev1beta1.ContainerDefaults, target *corev1beta1.ContainerImages)
+
+// ReplaceContainerImageForServices -
+func ReplaceContainerImageForServices(ctx context.Context, version *corev1beta1.OpenStackVersion, containerImages *corev1beta1.ContainerImages) {
+	Log := GetLogger(ctx)
+	if version.Spec.Services == nil || version.Status.AvailableVersion == nil {
+		return
+	}
+
+	availableVersion := *version.Status.AvailableVersion
+	if *version.Status.DeployedVersion == availableVersion {
+		return
+	}
+
+	serviceUpdaters := map[string]ImageUpdater{
+		"glance": func(source *corev1beta1.ContainerDefaults, target *corev1beta1.ContainerImages) {
+			target.GlanceAPIImage = source.GlanceAPIImage
+		},
+		"keystone": func(source *corev1beta1.ContainerDefaults, target *corev1beta1.ContainerImages) {
+			target.KeystoneAPIImage = source.KeystoneAPIImage
+		},
+	}
+
+	for _, service := range version.Spec.Services {
+		Log.Info(fmt.Sprintf("APPLY IMAGE %s TO SERVICE %s\n", service.Version, service.Name))
+
+		images, ok := version.Status.ContainerImageVersionDefaults[service.Version]
+		if !ok {
+			continue
+		}
+
+		updateImage, ok := serviceUpdaters[service.Name]
+		if !ok {
+			Log.Info(fmt.Sprintf("Service %s not found", service.Name))
+			continue
+		}
+
+		updateImage(images, containerImages)
+	}
+}

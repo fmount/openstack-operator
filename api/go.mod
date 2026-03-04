@@ -13,7 +13,7 @@ require (
 	github.com/openstack-k8s-operators/glance-operator/api v0.6.1-0.20260207191004-c3d99b4efdeb
 	github.com/openstack-k8s-operators/heat-operator/api v0.6.1-0.20260207082315-6c0673338be7
 	github.com/openstack-k8s-operators/horizon-operator/api v0.6.1-0.20260207170736-4c115ead3902
-	github.com/openstack-k8s-operators/infra-operator/apis v0.6.1-0.20260207181431-4cd3852ec206
+	github.com/openstack-k8s-operators/infra-operator/apis v0.6.1-0.20260212124933-d2541a526cd3
 	github.com/openstack-k8s-operators/ironic-operator/api v0.6.1-0.20260207081358-6dce1a518688
 	github.com/openstack-k8s-operators/keystone-operator/api v0.6.1-0.20260207175229-7370d3f57719
 	github.com/openstack-k8s-operators/lib-common/modules/common v0.6.1-0.20260205083029-d03e9df035ef
@@ -143,3 +143,9 @@ replace k8s.io/code-generator => k8s.io/code-generator v0.31.14 //allow-merging
 replace k8s.io/component-base => k8s.io/component-base v0.31.14 //allow-merging
 
 replace github.com/cert-manager/cmctl/v2 => github.com/cert-manager/cmctl/v2 v2.1.2-0.20241127223932-88edb96860cf //allow-merging
+
+replace github.com/openstack-k8s-operators/cinder-operator/api => github.com/fmount/cinder-operator/api v0.1.1-0.20260219092857-6522840e9e53
+
+replace github.com/openstack-k8s-operators/lib-common/modules/common => github.com/fmount/lib-common/modules/common v0.0.0-20260209225436-e7a12c0db54b
+
+replace github.com/openstack-k8s-operators/glance-operator/api => github.com/fmount/glance-operator/api v0.1.2-0.20260219091544-4e38ef0c378b

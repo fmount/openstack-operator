@@ -870,6 +870,75 @@ spec:
                             type: object
                           override:
                             properties:
+                              probes:
+                                properties:
+                                  livenessProbes:
+                                    properties:
+                                      failureThreshold:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      initialDelaySeconds:
+                                        format: int32
+                                        minimum: 0
+                                        type: integer
+                                      path:
+                                        pattern: ^(/.*)?$
+                                        type: string
+                                      periodSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      timeoutSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                    type: object
+                                  readinessProbes:
+                                    properties:
+                                      failureThreshold:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      initialDelaySeconds:
+                                        format: int32
+                                        minimum: 0
+                                        type: integer
+                                      path:
+                                        pattern: ^(/.*)?$
+                                        type: string
+                                      periodSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      timeoutSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                    type: object
+                                  startupProbes:
+                                    properties:
+                                      failureThreshold:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      initialDelaySeconds:
+                                        format: int32
+                                        minimum: 0
+                                        type: integer
+                                      path:
+                                        pattern: ^(/.*)?$
+                                        type: string
+                                      periodSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      timeoutSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                    type: object
+                                type: object
                               service:
                                 additionalProperties:
                                   properties:
@@ -1000,6 +1069,78 @@ spec:
                             additionalProperties:
                               type: string
                             type: object
+                          override:
+                            properties:
+                              probes:
+                                properties:
+                                  livenessProbes:
+                                    properties:
+                                      failureThreshold:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      initialDelaySeconds:
+                                        format: int32
+                                        minimum: 0
+                                        type: integer
+                                      path:
+                                        pattern: ^(/.*)?$
+                                        type: string
+                                      periodSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      timeoutSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                    type: object
+                                  readinessProbes:
+                                    properties:
+                                      failureThreshold:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      initialDelaySeconds:
+                                        format: int32
+                                        minimum: 0
+                                        type: integer
+                                      path:
+                                        pattern: ^(/.*)?$
+                                        type: string
+                                      periodSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      timeoutSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                    type: object
+                                  startupProbes:
+                                    properties:
+                                      failureThreshold:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      initialDelaySeconds:
+                                        format: int32
+                                        minimum: 0
+                                        type: integer
+                                      path:
+                                        pattern: ^(/.*)?$
+                                        type: string
+                                      periodSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      timeoutSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                    type: object
+                                type: object
+                            type: object
                           replicas:
                             default: 1
                             format: int32
@@ -1062,6 +1203,78 @@ spec:
                             nodeSelector:
                               additionalProperties:
                                 type: string
+                              type: object
+                            override:
+                              properties:
+                                probes:
+                                  properties:
+                                    livenessProbes:
+                                      properties:
+                                        failureThreshold:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        initialDelaySeconds:
+                                          format: int32
+                                          minimum: 0
+                                          type: integer
+                                        path:
+                                          pattern: ^(/.*)?$
+                                          type: string
+                                        periodSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        timeoutSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                      type: object
+                                    readinessProbes:
+                                      properties:
+                                        failureThreshold:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        initialDelaySeconds:
+                                          format: int32
+                                          minimum: 0
+                                          type: integer
+                                        path:
+                                          pattern: ^(/.*)?$
+                                          type: string
+                                        periodSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        timeoutSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                      type: object
+                                    startupProbes:
+                                      properties:
+                                        failureThreshold:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        initialDelaySeconds:
+                                          format: int32
+                                          minimum: 0
+                                          type: integer
+                                        path:
+                                          pattern: ^(/.*)?$
+                                          type: string
+                                        periodSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        timeoutSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                      type: object
+                                  type: object
                               type: object
                             replicas:
                               default: 1
@@ -1126,6 +1339,78 @@ spec:
                             additionalProperties:
                               type: string
                             type: object
+                          override:
+                            properties:
+                              probes:
+                                properties:
+                                  livenessProbes:
+                                    properties:
+                                      failureThreshold:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      initialDelaySeconds:
+                                        format: int32
+                                        minimum: 0
+                                        type: integer
+                                      path:
+                                        pattern: ^(/.*)?$
+                                        type: string
+                                      periodSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      timeoutSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                    type: object
+                                  readinessProbes:
+                                    properties:
+                                      failureThreshold:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      initialDelaySeconds:
+                                        format: int32
+                                        minimum: 0
+                                        type: integer
+                                      path:
+                                        pattern: ^(/.*)?$
+                                        type: string
+                                      periodSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      timeoutSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                    type: object
+                                  startupProbes:
+                                    properties:
+                                      failureThreshold:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      initialDelaySeconds:
+                                        format: int32
+                                        minimum: 0
+                                        type: integer
+                                      path:
+                                        pattern: ^(/.*)?$
+                                        type: string
+                                      periodSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                      timeoutSeconds:
+                                        format: int32
+                                        minimum: 1
+                                        type: integer
+                                    type: object
+                                type: object
+                            type: object
                           replicas:
                             default: 1
                             format: int32
@@ -1188,6 +1473,78 @@ spec:
                             nodeSelector:
                               additionalProperties:
                                 type: string
+                              type: object
+                            override:
+                              properties:
+                                probes:
+                                  properties:
+                                    livenessProbes:
+                                      properties:
+                                        failureThreshold:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        initialDelaySeconds:
+                                          format: int32
+                                          minimum: 0
+                                          type: integer
+                                        path:
+                                          pattern: ^(/.*)?$
+                                          type: string
+                                        periodSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        timeoutSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                      type: object
+                                    readinessProbes:
+                                      properties:
+                                        failureThreshold:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        initialDelaySeconds:
+                                          format: int32
+                                          minimum: 0
+                                          type: integer
+                                        path:
+                                          pattern: ^(/.*)?$
+                                          type: string
+                                        periodSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        timeoutSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                      type: object
+                                    startupProbes:
+                                      properties:
+                                        failureThreshold:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        initialDelaySeconds:
+                                          format: int32
+                                          minimum: 0
+                                          type: integer
+                                        path:
+                                          pattern: ^(/.*)?$
+                                          type: string
+                                        periodSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        timeoutSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                      type: object
+                                  type: object
                               type: object
                             replicas:
                               default: 1
@@ -4534,6 +4891,75 @@ spec:
                               type: object
                             override:
                               properties:
+                                probes:
+                                  properties:
+                                    livenessProbes:
+                                      properties:
+                                        failureThreshold:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        initialDelaySeconds:
+                                          format: int32
+                                          minimum: 0
+                                          type: integer
+                                        path:
+                                          pattern: ^(/.*)?$
+                                          type: string
+                                        periodSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        timeoutSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                      type: object
+                                    readinessProbes:
+                                      properties:
+                                        failureThreshold:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        initialDelaySeconds:
+                                          format: int32
+                                          minimum: 0
+                                          type: integer
+                                        path:
+                                          pattern: ^(/.*)?$
+                                          type: string
+                                        periodSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        timeoutSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                      type: object
+                                    startupProbes:
+                                      properties:
+                                        failureThreshold:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        initialDelaySeconds:
+                                          format: int32
+                                          minimum: 0
+                                          type: integer
+                                        path:
+                                          pattern: ^(/.*)?$
+                                          type: string
+                                        periodSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                        timeoutSeconds:
+                                          format: int32
+                                          minimum: 1
+                                          type: integer
+                                      type: object
+                                  type: object
                                 service:
                                   additionalProperties:
                                     properties:

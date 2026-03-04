@@ -17,7 +17,7 @@ if [ -n "$DOCKERFILE" ]; then
 fi
 
 #loop over each openstack-k8s-operators go.mod entry
-MOD_PATHS=$(go list -mod=readonly -m -json all | jq -r '. | select(.Path | contains("openstack")) | .Replace // . |.Path' | grep -v openstack-operator | grep -v lib-common)
+MOD_PATHS=$(go list -mod=readonly -m -json all | jq -r '. | select(.Path | contains("openstack")) | .Replace // . |.Path' | grep -v openstack-operator | grep -v lib-common | grep -v cinder | grep -v glance)
 for MOD_PATH in ${MOD_PATHS}; do
     if [[ "$MOD_PATH" == "./apis" ]]; then
         continue
@@ -118,4 +118,6 @@ done
 if [ -z "$DOCKERFILE" ]; then
     # pin rabbit to sha256 for our v2.16.0_patches fork
     echo -n ",quay.io/openstack-k8s-operators/rabbitmq-cluster-operator-bundle@sha256:1612b82e274827281af1d64740a7d52e21745bc74c91d5149f111135d8e7779f"
+    echo -n ",quay.io/fpantano/glance-operator-bundle@sha256:9fa6fb176f76324dd8a43d3e29dec5b0c1a6b3e00696680e856f2bc3f86a4924"
+    echo -n ",quay.io/fpantano/cinder-operator-bundle@sha256:fcdcf852218f550996e6d31d676f2266a0e1fb92cfc8ce1357519eb0b887332b"
 fi

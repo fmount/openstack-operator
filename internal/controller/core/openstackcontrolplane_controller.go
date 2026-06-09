@@ -24,6 +24,7 @@ import (
 	"time"
 
 	certmgrv1 "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
+	configv1 "github.com/openshift/api/config/v1"
 	routev1 "github.com/openshift/api/route/v1"
 	barbicanv1 "github.com/openstack-k8s-operators/barbican-operator/api/v1beta1"
 	cinderv1 "github.com/openstack-k8s-operators/cinder-operator/api/v1beta1"
@@ -128,6 +129,7 @@ func (r *OpenStackControlPlaneReconciler) GetLogger(ctx context.Context) logr.Lo
 // +kubebuilder:rbac:groups=cert-manager.io,resources=issuers,verbs=get;list;watch;create;update;patch;delete;
 // +kubebuilder:rbac:groups=cert-manager.io,resources=certificates,verbs=get;list;watch;create;update;patch;delete;
 // +kubebuilder:rbac:groups=config.openshift.io,resources=networks,verbs=get;list;watch;
+// +kubebuilder:rbac:groups=config.openshift.io,resources=apiservers,verbs=get;list;watch;
 // +kubebuilder:rbac:groups=topology.openstack.org,resources=topologies,verbs=get;list;watch;update
 // +kubebuilder:rbac:groups=watcher.openstack.org,resources=watchers,verbs=get;list;watch;create;update;patch;delete
 
@@ -529,6 +531,13 @@ func (r *OpenStackControlPlaneReconciler) reconcileNormal(ctx context.Context, i
 		return ctrlResult, nil
 	}
 
+	ctrlResult, err = openstack.ReconcileTLSProfile(ctx, instance, helper)
+	if err != nil {
+		return ctrl.Result{}, err
+	} else if (ctrlResult != ctrl.Result{}) {
+		return ctrlResult, nil
+	}
+
 	ctrlResult, err = openstack.ReconcileDNSMasqs(ctx, instance, version, helper)
 	if err != nil {
 		return ctrl.Result{}, err
@@ -915,6 +924,11 @@ func (r *OpenStackControlPlaneReconciler) SetupWithManager(
 			&corev1.Secret{},
 			handler.EnqueueRequestsFromMapFunc(r.findControlPlaneForSrc),
 			builder.WithPredicates(backup.AnnotationChangedPredicate(openstack.ServiceCertSelector)),
+		).
+		Watches(
+			&configv1.APIServer{},
+			handler.EnqueueRequestsFromMapFunc(r.findControlPlaneForSrc),
+			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
 		).
 		Complete(r)
 }

@@ -108,7 +108,7 @@ const (
 	// OpenStackControlPlaneCustomTLSReadyCondition Status=True condition which indicates if custom TLS certificate secrets are configured and operational
 	OpenStackControlPlaneCustomTLSReadyCondition condition.Type = "OpenStackControlPlaneCustomTLSReadyCondition"
 
-	// OpenStackControlPlaneTLSProfileReadyCondition Status=True condition which indicates if the APIServer TLS profile has been resolved and the SSL profile secret created
+	// OpenStackControlPlaneTLSProfileReadyCondition Status=True condition which indicates if the APIServer TLS profile has been resolved and the SSL profile ConfigMap created
 	OpenStackControlPlaneTLSProfileReadyCondition condition.Type = "OpenStackControlPlaneTLSProfileReady"
 
 	// OpenStackControlPlaneTelemetryReadyCondition Status=True condition which indicates if OpenStack Telemetry service is configured and operational
@@ -490,7 +490,7 @@ const (
 	OpenStackControlPlaneTLSProfileReadyInitMessage = "OpenStackControlPlane TLS profile not started"
 
 	// OpenStackControlPlaneTLSProfileReadyMessage
-	OpenStackControlPlaneTLSProfileReadyMessage = "OpenStackControlPlane TLS profile secret created"
+	OpenStackControlPlaneTLSProfileReadyMessage = "OpenStackControlPlane TLS profile ConfigMap created"
 
 	// OpenStackControlPlaneTLSProfileReadyErrorMessage
 	OpenStackControlPlaneTLSProfileReadyErrorMessage = "OpenStackControlPlane TLS profile error occured %s"

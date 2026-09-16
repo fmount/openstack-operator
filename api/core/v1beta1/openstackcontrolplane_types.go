@@ -268,6 +268,16 @@ type TLSSection struct {
 
 	// +kubebuilder:validation:optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
+	// InheritClusterProfile - Whether the OpenStack services should
+	// inherit the cluster-wide TLS security profile from the OpenShift
+	// APIServer. When false (the default), no profile is resolved or
+	// published and the services keep the built-in defaults shipped
+	// with lib-common.
+	// +kubebuilder:default=false
+	InheritClusterProfile bool `json:"inheritClusterProfile,omitempty"`
+
+	// +kubebuilder:validation:optional
+	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	// Secret containing any additional CA certificates, which should be added to deployment pods.
 	// If services get configured to use a custom cert/key, add the CA cert to validate those in this
 	// CA secret.

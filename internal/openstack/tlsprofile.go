@@ -35,8 +35,25 @@ var tlsVersionToSSLProtocol = map[configv1.TLSProtocolVersion]string{
 // Template it renders, so service operators inherit the cluster TLS settings
 // NOTE: openstack-operator owns the object's whole lifecycle; lib-common only
 // consumes it, and renders built-in defaults when it is not present.
+//
+// When the control plane does not inherit the cluster TLS profile, nothing
+// is resolved: any previously published ConfigMap is withdrawn and the
+// TLSProfileReady condition is removed, so the status does not describe a
+// feature that is off.
 func ReconcileTLSProfile(ctx context.Context, instance *corev1.OpenStackControlPlane, helper *helper.Helper) (ctrl.Result, error) {
 	Log := GetLogger(ctx)
+
+	// Inheritance disabled: the services stay on the built-in defaults.
+	// Withdrawing the ConfigMap (a no-op when it is not there) and dropping
+	// the condition makes "inheritance was switched off" converge to the
+	// same state as "it was never on".
+	if !instance.Spec.TLS.InheritClusterProfile {
+		if err := configmap.DeleteConfigMapWithName(ctx, helper, util.TLSProfileConfigMap, instance.Namespace); err != nil {
+			return ctrl.Result{}, err
+		}
+		instance.Status.Conditions.Remove(corev1.OpenStackControlPlaneTLSProfileReadyCondition)
+		return ctrl.Result{}, nil
+	}
 
 	apiServer := &configv1.APIServer{}
 	if err := helper.GetClient().Get(ctx, types.NamespacedName{Name: "cluster"}, apiServer); err != nil {

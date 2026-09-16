@@ -88,6 +88,26 @@ func profileCiphers(profileType ocp_configv1.TLSProfileType) string {
 	return strings.Join(ocp_configv1.TLSProfiles[profileType].Ciphers, ":")
 }
 
+// defaultInheritingSpec - the default control plane spec with cluster TLS
+// profile inheritance explicitly enabled: the CRD default is off, so every
+// spec that expects the operator to publish the profile has to ask for it
+func defaultInheritingSpec() map[string]interface{} {
+	spec := GetDefaultOpenStackControlPlaneSpec()
+	spec["tls"] = map[string]interface{}{"inheritClusterProfile": true}
+	return spec
+}
+
+// hasTLSProfileCondition - whether the control plane status still carries
+// the TLS profile condition
+func hasTLSProfileCondition(cp *corev1.OpenStackControlPlane) bool {
+	for _, c := range cp.Status.Conditions {
+		if c.Type == corev1.OpenStackControlPlaneTLSProfileReadyCondition {
+			return true
+		}
+	}
+	return false
+}
+
 var _ = Describe("OpenStackOperator TLS profile", func() {
 	BeforeEach(func() {
 		err := os.Setenv("OPERATOR_TEMPLATES", "../../templates")
@@ -114,7 +134,7 @@ var _ = Describe("OpenStackOperator TLS profile", func() {
 			createAPIServer(profile)
 			DeferCleanup(
 				th.DeleteInstance,
-				CreateOpenStackControlPlane(names.OpenStackControlplaneName, GetDefaultOpenStackControlPlaneSpec()),
+				CreateOpenStackControlPlane(names.OpenStackControlplaneName, defaultInheritingSpec()),
 			)
 
 			th.ExpectCondition(
@@ -168,7 +188,7 @@ var _ = Describe("OpenStackOperator TLS profile", func() {
 		BeforeEach(func() {
 			DeferCleanup(
 				th.DeleteInstance,
-				CreateOpenStackControlPlane(names.OpenStackControlplaneName, GetDefaultOpenStackControlPlaneSpec()),
+				CreateOpenStackControlPlane(names.OpenStackControlplaneName, defaultInheritingSpec()),
 			)
 		})
 
@@ -198,7 +218,7 @@ var _ = Describe("OpenStackOperator TLS profile", func() {
 			})
 			DeferCleanup(
 				th.DeleteInstance,
-				CreateOpenStackControlPlane(names.OpenStackControlplaneName, GetDefaultOpenStackControlPlaneSpec()),
+				CreateOpenStackControlPlane(names.OpenStackControlplaneName, defaultInheritingSpec()),
 			)
 		})
 
@@ -228,7 +248,7 @@ var _ = Describe("OpenStackOperator TLS profile", func() {
 			})
 			DeferCleanup(
 				th.DeleteInstance,
-				CreateOpenStackControlPlane(names.OpenStackControlplaneName, GetDefaultOpenStackControlPlaneSpec()),
+				CreateOpenStackControlPlane(names.OpenStackControlplaneName, defaultInheritingSpec()),
 			)
 		})
 
@@ -270,7 +290,7 @@ var _ = Describe("OpenStackOperator TLS profile", func() {
 			})
 			DeferCleanup(
 				th.DeleteInstance,
-				CreateOpenStackControlPlane(names.OpenStackControlplaneName, GetDefaultOpenStackControlPlaneSpec()),
+				CreateOpenStackControlPlane(names.OpenStackControlplaneName, defaultInheritingSpec()),
 			)
 		})
 
@@ -298,7 +318,7 @@ var _ = Describe("OpenStackOperator TLS profile", func() {
 			})
 			DeferCleanup(
 				th.DeleteInstance,
-				CreateOpenStackControlPlane(names.OpenStackControlplaneName, GetDefaultOpenStackControlPlaneSpec()),
+				CreateOpenStackControlPlane(names.OpenStackControlplaneName, defaultInheritingSpec()),
 			)
 		})
 
@@ -321,6 +341,73 @@ var _ = Describe("OpenStackOperator TLS profile", func() {
 				corev1.OpenStackControlPlaneTLSProfileReadyCondition,
 				k8s_corev1.ConditionTrue,
 			)
+		})
+	})
+
+	When("the control plane does not inherit the cluster TLS profile", func() {
+		BeforeEach(func() {
+			// the cluster declares a profile that would otherwise be
+			// published, and the default spec leaves inheritance off
+			createAPIServer(&ocp_configv1.TLSSecurityProfile{
+				Type: ocp_configv1.TLSProfileModernType,
+			})
+			DeferCleanup(
+				th.DeleteInstance,
+				CreateOpenStackControlPlane(names.OpenStackControlplaneName, GetDefaultOpenStackControlPlaneSpec()),
+			)
+		})
+
+		It("publishes no ConfigMap and sets no TLS profile condition", func() {
+			Consistently(func(g Gomega) {
+				err := k8sClient.Get(ctx, types.NamespacedName{
+					Name:      util.TLSProfileConfigMap,
+					Namespace: names.Namespace,
+				}, &k8s_corev1.ConfigMap{})
+				g.Expect(k8s_errors.IsNotFound(err)).To(BeTrue())
+
+				cp := &corev1.OpenStackControlPlane{}
+				g.Expect(k8sClient.Get(ctx, names.OpenStackControlplaneName, cp)).To(Succeed())
+				g.Expect(hasTLSProfileCondition(cp)).To(BeFalse())
+			}, timeout, interval).Should(Succeed())
+		})
+	})
+
+	When("inheritance is switched off while a profile is published", func() {
+		BeforeEach(func() {
+			createAPIServer(&ocp_configv1.TLSSecurityProfile{
+				Type: ocp_configv1.TLSProfileOldType,
+			})
+			DeferCleanup(
+				th.DeleteInstance,
+				CreateOpenStackControlPlane(names.OpenStackControlplaneName, defaultInheritingSpec()),
+			)
+		})
+
+		It("withdraws the ConfigMap and removes the TLS profile condition", func() {
+			cm := getTLSProfileConfigMap()
+			Expect(cm.Data).To(HaveKeyWithValue(
+				"SSLCipherSuite", profileCiphers(ocp_configv1.TLSProfileOldType)))
+
+			// an admin keeping the feature disabled, e.g. through a minor
+			// update: the services must go back to the built-in defaults
+			Eventually(func(g Gomega) {
+				cp := &corev1.OpenStackControlPlane{}
+				g.Expect(k8sClient.Get(ctx, names.OpenStackControlplaneName, cp)).Should(Succeed())
+				cp.Spec.TLS.InheritClusterProfile = false
+				g.Expect(k8sClient.Update(ctx, cp)).Should(Succeed())
+			}, timeout, interval).Should(Succeed())
+
+			Eventually(func(g Gomega) {
+				err := k8sClient.Get(ctx, types.NamespacedName{
+					Name:      util.TLSProfileConfigMap,
+					Namespace: names.Namespace,
+				}, &k8s_corev1.ConfigMap{})
+				g.Expect(k8s_errors.IsNotFound(err)).To(BeTrue())
+
+				cp := &corev1.OpenStackControlPlane{}
+				g.Expect(k8sClient.Get(ctx, names.OpenStackControlplaneName, cp)).To(Succeed())
+				g.Expect(hasTLSProfileCondition(cp)).To(BeFalse())
+			}, timeout, interval).Should(Succeed())
 		})
 	})
 })
